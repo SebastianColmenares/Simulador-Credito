@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Crédito Hipotecario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .option-card {
+            flex: 0 0 18%;
+            text-align: center;
+        }
+        .option-card button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .option-card .material-symbols-outlined {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        .header-text {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+        }
+        .calc-content {
+            margin-top: 20px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .result-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .result-card .material-symbols-outlined {
+            font-size: 50px;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        .result-card h5 {
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+        .result-card p {
+            margin: 5px 0;
+        }
+        .result-card p b {
+            font-weight: 700;
+        }
+        .table-responsive {
+            max-height: 500px;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: #5e6266;">account_balance</span>
+        <h1>Simulador de Crédito Hipotecario</h1>
+    </div>
+    <div class="container mt-5">
+        <div class="header-text">Tenemos estas opciones para ti</div>
+        <div class="options-container">
+            <div class="card option-card">
+                <div class="card-body p-0">
+                    <button type="button" class="btn btn-outline-primary" onclick="showForm('casa')">
+                        <span class="material-symbols-outlined">house</span>
+                        <div>Comprar casa</div>
+                    </button>
+                </div>
+            </div>
+            <div class="card option-card">
+                <div class="card-body p-0">
+                    <button type="button" class="btn btn-outline-primary" onclick="showForm('terreno')">
+                        <span class="material-symbols-outlined">landscape</span>
+                        <div>Comprar un terreno</div>
+                    </button>
+                </div>
+            </div>
+            <div class="card option-card">
+                <div class="card-body p-0">
+                    <button type="button" class="btn btn-outline-primary" onclick="showForm('remodelar')">
+                        <span class="material-symbols-outlined">wall_art</span>
+                        <div>Remodelar tu casa</div>
+                    </button>
+                </div>
+            </div>
+            <div class="card option-card">
+                <div class="card-body p-0">
+                    <button type="button" class="btn btn-outline-primary" onclick="showForm('hipoteca')">
+                        <span class="material-symbols-outlined">real_estate_agent</span>
+                        <div>Cambiar tu hipoteca</div>
+                    </button>
+                </div>
+            </div>
+            <div class="card option-card">
+                <div class="card-body p-0">
+                    <button type="button" class="btn btn-outline-primary" onclick="showForm('liquidez')">
+                        <span class="material-symbols-outlined">paid</span>
+                        <div>Obtener liquidez</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="calc-content" class="calc-content">
+            <!-- Formulario para Comprar Casa -->
+            <div id="casa" class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="casaPrecio" class="form-label"><b>¿Cuánto cuesta la casa que quieres?</b></label>
+                                <input type="number" class="form-control" id="casaPrecio" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="estadoCasa" class="form-label"><b>Estado</b></label>
+                                <select class="form-control" id="estadoCasa" required>
+                                    <option value="">Selecciona el estado</option>
+                                    <option value="Aguascalientes">Baja California</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="casaPlazo" class="form-label"><b>¿Cuánto tiempo necesitas para pagar?</b></label>
+                                <select class="form-control" id="casaPlazo" required>
+                                    <option value="">Selecciona los años</option>
+                                    <option value="5">5 años</option>
+                                    <option value="10">10 años</option>
+                                    <option value="15">15 años</option>
+                                    <option value="20">20 años</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="calcularCasa()">Calcular</button>
+                        </form>
+                        <div id="resultadoCasa" class="result-card"></div>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#amortizationModal">Ver tabla de amortización</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario para Comprar Terreno -->
+            <div id="terreno" class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="terrenoPrecio" class="form-label"><b>¿Cuánto cuesta el terreno que quieres?</b></label>
+                                <input type="number" class="form-control" id="terrenoPrecio" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="estadoTerreno" class="form-label"><b>Estado</b></label>
+                                <select class="form-control" id="estadoTerreno" required>
+                                    <option value="">Selecciona el estado</option>
+                                    <option value="Aguascalientes">Baja California</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="terrenoPlazo" class="form-label"><b>¿Cuánto tiempo necesitas para pagar?</b></label>
+                                <select class="form-control" id="terrenoPlazo" required>
+                                    <option value="">Selecciona los años</option>
+                                    <option value="5">5 años</option>
+                                    <option value="10">10 años</option>
+                                    <option value="15">15 años</option>
+                                    <option value="20">20 años</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="calcularTerreno()">Calcular</button>
+                        </form>
+                        <div id="resultadoTerreno" class="result-card"></div>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#amortizationModal">Ver tabla de amortización</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario para Remodelar Casa -->
+            <div id="remodelar" class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="remodelarCosto" class="form-label"><b>¿Cuánto cuesta la casa que quieres remodelar?</b></label>
+                                <input type="number" class="form-control" id="remodelarCosto" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="remodelarPlazo" class="form-label"><b>¿Cuánto tiempo necesitas para pagar?</b></label>
+                                <select class="form-control" id="remodelarPlazo" required>
+                                    <option value="">Selecciona los años</option>
+                                    <option value="5">5 años</option>
+                                    <option value="10">10 años</option>
+                                    <option value="15">15 años</option>
+                                    <option value="20">20 años</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="calcularRemodelar()">Calcular</button>
+                        </form>
+                        <div id="resultadoRemodelar" class="result-card"></div>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#amortizationModal">Ver tabla de amortización</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario para Cambiar Hipoteca -->
+            <div id="hipoteca" class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="hipotecaMonto" class="form-label"><b>¿Cuánto debes de tu crédito?</b></label>
+                                <input type="number" class="form-control" id="hipotecaMonto" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="hipotecaValor" class="form-label"><b>¿Cuánto vale tu casa?</b></label>
+                                <input type="number" class="form-control" id="hipotecaValor" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="hipotecaPlazo" class="form-label"><b>¿Cuánto tiempo necesitas para pagar?</b></label>
+                                <select class="form-control" id="hipotecaPlazo" required>
+                                    <option value="">Selecciona los años</option>
+                                    <option value="5">5 años</option>
+                                    <option value="10">10 años</option>
+                                    <option value="15">15 años</option>
+                                    <option value="20">20 años</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="calcularHipoteca()">Calcular</button>
+                        </form>
+                        <div id="resultadoHipoteca" class="result-card"></div>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#amortizationModal">Ver tabla de amortización</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario para Obtener Liquidez -->
+            <div id="liquidez" class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="liquidezMonto" class="form-label"><b>¿Cuánto vale tu casa?</b></label>
+                                <input type="number" class="form-control" id="liquidezMonto" placeholder="Ingresa cantidad" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="liquidezPlazo" class="form-label"><b>¿Cuánto tiempo necesitas para pagar?</b></label>
+                                <select class="form-control" id="liquidezPlazo" required>
+                                    <option value="">Selecciona los años</option>
+                                    <option value="5">5 años</option>
+                                    <option value="10">10 años</option>
+                                    <option value="15">15 años</option>
+                                    <option value="20">20 años</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="calcularLiquidez()">Calcular</button>
+                        </form>
+                        <div id="resultadoLiquidez" class="result-card"></div>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#amortizationModal">Ver tabla de amortización</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="amortizationModal" tabindex="-1" aria-labelledby="amortizationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="amortizationModalLabel">Tabla de Amortización</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>PAGO</th>
+                                    <th>SALDO INSOLUTO</th>
+                                    <th>INTERÉS</th>
+                                    <th>AMORTIZACIÓN</th>
+                                    <th>MENSUALIDAD (S/ACCESORIOS)</th>
+                                    <th>SEGUROS DE VIDA Y DAÑOS*</th>
+                                    <th>COM. AUT. CRED. DIF.</th>
+                                    <th>MENSUALIDAD TOTAL</th>
+                                    <th>PAGOS ANTICIPADOS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="amortizationTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showForm(option) {
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.getElementById(option).classList.add('active');
+        }
+
+        function calcularCasa() {
+            var precio = parseFloat(document.getElementById('casaPrecio').value);
+            if (precio <= 0) {
+                alert('El precio debe ser un valor positivo.');
+                return;
+            }
+
+            var plazo = parseInt(document.getElementById('casaPlazo').value);
+            var enganche = precio * 0.1; // 10% del precio como enganche
+            var montoPrestamo = precio - enganche;
+            var tasaInteres = 0.111; // 11.1% anual
+            var n = plazo * 12; // plazo en meses
+            var r = tasaInteres / 12; // tasa de interés mensual
+
+            var pagoMensual = (montoPrestamo * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            pagoMensual = 3736.99 - 40.50 - 166.13; // Ajustando el pago mensual
+            pagoMensual = pagoMensual.toFixed(2);
+
+            // El pago mensual no debe superar el 36% del ingreso mensual bruto
+            var ingresoMensual = (pagoMensual / 0.36).toFixed(2);
+
+            var resultado = `
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h5>Hipoteca Fija</h5>
+                <p>Tu hogar con la tranquilidad de mensualidades fijas.</p>
+                <p>Te prestamos 90% - $${montoPrestamo.toFixed(2)}</p>
+                <p>Enganche mínimo: $${enganche.toFixed(2)}</p>
+                <hr>
+                <p><b>Tasa de interés ordinaria anual: fija</b></p>
+                <p>11.10%</p>
+                <p><b>Pago mensual: $${pagoMensual}</b></p>
+                <p>Ingreso mensual necesario: $${ingresoMensual}</p>
+                <p>CAT 13.8 % sin IVA*</p>
+            `;
+            document.getElementById('resultadoCasa').innerHTML = resultado;
+
+            generarTablaAmortizacion(montoPrestamo, r, n, pagoMensual);
+        }
+
+        function calcularTerreno() {
+            var precio = parseFloat(document.getElementById('terrenoPrecio').value);
+            if (precio <= 0) {
+                alert('El precio debe ser un valor positivo.');
+                return;
+            }
+
+            var plazo = parseInt(document.getElementById('terrenoPlazo').value);
+            var enganche = precio * 0.3; // 30% del precio como enganche
+            var montoPrestamo = precio - enganche;
+            var tasaInteres = 0.127; // 12.7% anual
+            var n = plazo * 12; // plazo en meses
+            var r = tasaInteres / 12; // tasa de interés mensual
+
+            var pagoMensual = (montoPrestamo * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            pagoMensual = pagoMensual.toFixed(2);
+
+            var ingresoMensual = (pagoMensual / 0.36).toFixed(2);
+
+            var resultado = `
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h5>Terreno con Servicios</h5>
+                <p>Compra un terreno con servicios en zonas urbanas de todo el estado.</p>
+                <p>Te prestamos 70% - $${montoPrestamo.toFixed(2)}</p>
+                <p>Enganche mínimo: $${enganche.toFixed(2)}</p>
+                <hr>
+                <p><b>Tasa de interés ordinaria anual: fija</b></p>
+                <p>12.70%</p>
+                <p><b>Pago mensual: $${pagoMensual}</b></p>
+                <p>Ingreso mensual necesario: $${ingresoMensual}</p>
+                <p>CAT 14.8 % sin IVA*</p>
+            `;
+            document.getElementById('resultadoTerreno').innerHTML = resultado;
+
+            generarTablaAmortizacion(montoPrestamo, r, n, pagoMensual);
+        }
+
+        function calcularRemodelar() {
+            var costo = parseFloat(document.getElementById('remodelarCosto').value);
+            if (costo <= 0) {
+                alert('El costo debe ser un valor positivo.');
+                return;
+            }
+
+            var plazo = parseInt(document.getElementById('remodelarPlazo').value);
+            var tasaInteres = 0.111; // 11.1% anual
+            var n = plazo * 12; // plazo en meses
+            var r = tasaInteres / 12; // tasa de interés mensual
+
+            var montoPrestamo = costo * 0.4; // 40% del costo total
+            var pagoMensual = (montoPrestamo * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            pagoMensual = pagoMensual.toFixed(2);
+
+            var ingresoMensual = (pagoMensual / 0.36).toFixed(2);
+
+            var resultado = `
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h5>Remodela Tu Casa</h5>
+                <p>Crédito para remodelación, ampliación, mejora o terminación de obra en todo el estado.</p>
+                <p>Te prestamos 40% - $${montoPrestamo.toFixed(2)}</p>
+                <p>Enganche mínimo: $0</p>
+                <hr>
+                <p><b>Tasa de interés ordinaria anual: fija</b></p>
+                <p>11.10%</p>
+                <p><b>Pago mensual: $${pagoMensual}</b></p>
+                <p>Ingreso mensual necesario: $${ingresoMensual}</p>
+                <p>CAT 14.8 % sin IVA*</p>
+            `;
+            document.getElementById('resultadoRemodelar').innerHTML = resultado;
+
+            generarTablaAmortizacion(montoPrestamo, r, n, pagoMensual);
+        }
+
+        function calcularHipoteca() {
+            var monto = parseFloat(document.getElementById('hipotecaMonto').value);
+            var valor = parseFloat(document.getElementById('hipotecaValor').value);
+            if (monto <= 0 || valor <= 0) {
+                alert('El monto y el valor deben ser valores positivos.');
+                return;
+            }
+
+            var plazo = parseInt(document.getElementById('hipotecaPlazo').value);
+            var tasaInteres = 0.103; // 10.3% anual
+            var n = plazo * 12; // plazo en meses
+            var r = tasaInteres / 12; // tasa de interés mensual
+
+            var montoPrestamo = valor * 0.27; // 27% del valor total
+            var pagoMensual = (montoPrestamo * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            pagoMensual = pagoMensual.toFixed(2);
+
+            var ingresoMensual = (pagoMensual / 0.36).toFixed(2);
+
+            var resultado = `
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h5>Muda Tu Hipoteca</h5>
+                <p>Mejorar las condiciones de pago del crédito hipotecario que tengas con otra institución financiera.</p>
+                <p>Te prestamos 27% - $${montoPrestamo.toFixed(2)}</p>
+                <p>Enganche mínimo: $0</p>
+                <hr>
+                <p><b>Tasa de interés ordinaria anual: fija</b></p>
+                <p>10.30%</p>
+                <p><b>Pago mensual: $${pagoMensual}</b></p>
+                <p>Ingreso mensual necesario: $${ingresoMensual}</p>
+                <p>CAT 14.8 % sin IVA*</p>
+            `;
+            document.getElementById('resultadoHipoteca').innerHTML = resultado;
+
+            generarTablaAmortizacion(montoPrestamo, r, n, pagoMensual);
+        }
+
+        function calcularLiquidez() {
+            var valor = parseFloat(document.getElementById('liquidezMonto').value);
+            if (valor <= 0) {
+                alert('El valor debe ser un valor positivo.');
+                return;
+            }
+
+            var plazo = parseInt(document.getElementById('liquidezPlazo').value);
+            var tasaInteres = 0.14; // 14% anual
+            var n = plazo * 12; // plazo en meses
+            var r = tasaInteres / 12; // tasa de interés mensual
+
+            var montoPrestamo = valor * 0.75; // 75% del valor total
+            var pagoMensual = (montoPrestamo * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            pagoMensual = pagoMensual.toFixed(2);
+
+            var ingresoMensual = (pagoMensual / 0.36).toFixed(2);
+
+            var resultado = `
+                <span class="material-symbols-outlined">calendar_month</span>
+                <h5>Tu Casa Te Presta</h5>
+                <p>Elige libremente el destino de los recursos.</p>
+                <p>Te prestamos 75% - $${montoPrestamo.toFixed(2)}</p>
+                <p>Enganche mínimo: $0</p>
+                <hr>
+                <p><b>Tasa de interés ordinaria anual: fija</b></p>
+                <p>14.00%</p>
+                <p><b>Pago mensual: $${pagoMensual}</b></p>
+                <p>Ingreso mensual necesario: $${ingresoMensual}</p>
+                <p>CAT 17.1 % sin IVA*</p>
+            `;
+            document.getElementById('resultadoLiquidez').innerHTML = resultado;
+
+            generarTablaAmortizacion(montoPrestamo, r, n, pagoMensual);
+        }
+
+        function generarTablaAmortizacion(monto, tasa, plazo, pagoMensual) {
+            var saldoInsoluto = monto;
+            var tbody = document.getElementById('amortizationTableBody');
+            tbody.innerHTML = '';
+
+            var seguros = 40.50; // Valor fijo para seguros
+            var comisiones = 166.13; // Valor fijo para comisiones
+
+            for (var i = 1; i <= plazo; i++) {
+                var interes = saldoInsoluto * tasa;
+                var amortizacion = pagoMensual - interes;
+                saldoInsoluto -= amortizacion;
+                
+                var mensualidadTotal = parseFloat(pagoMensual) + seguros + comisiones;
+
+                var row = `
+                    <tr>
+                        <td>${i}</td>
+                        <td>$ ${saldoInsoluto.toFixed(2)}</td>
+                        <td>$ ${interes.toFixed(2)}</td>
+                        <td>$ ${amortizacion.toFixed(2)}</td>
+                        <td>$ ${pagoMensual}</td>
+                        <td>$ ${seguros.toFixed(2)}</td>
+                        <td>$ ${comisiones.toFixed(2)}</td>
+                        <td>$ ${mensualidadTotal.toFixed(2)}</td>
+                        <td>$ 0.00</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
